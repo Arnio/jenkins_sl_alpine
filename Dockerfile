@@ -29,25 +29,3 @@ RUN cd /tmp/ && tar -xzf /tmp/openshift-origin-client-tools-v3.11.0-bd0bee4-337-
 RUN ls -la /tmp/
 RUN ls -la /usr/local/bin/
 # RUN chmod u+x /usr/local/bin/oc && chmod u+x /usr/local/bin/kubectl
-
-
-
-# RUN mkdir -p /var/www/html /var/run/php/ && \
-#     sed -i -e 's/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/g' /etc/php7/php.ini && \
-#     sed -i "s|;*memory_limit =.*|memory_limit = 256M|i" /etc/php7/php.ini
-
-# RUN curl -sS https://getcomposer.org/installer -o composer-setup.php && \
-#     php composer-setup.php --install-dir=/usr/local/bin --filename=composer 
-
-# COPY ./nginx.conf /etc/nginx/nginx.conf
-# COPY ./default /etc/nginx/conf.d/default.conf
-# COPY ./www.conf /etc/php7/php-fpm.d/www.conf
-# # COPY ./start.sh /usr/local/bin/
-# # COPY ./initapp.sh /usr/local/bin/
-# COPY ./scripts/*.* /usr/local/bin/
-# COPY ./info.php /var/www/html/index.php
-# RUN chown -R nginx:nginx /var/www/html && \
-#     chmod u+x /usr/local/bin/start.sh 
-EXPOSE 22
-EXPOSE 50000
-#ENTRYPOINT [ "start.sh" ]
