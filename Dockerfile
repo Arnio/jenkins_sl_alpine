@@ -70,6 +70,6 @@ RUN ls -la /tmp/
 RUN ls -la /usr/local/bin/
 RUN chmod u+x /usr/local/bin/oc && chmod u+x /usr/local/bin/kubectl
 
-USER 1000
+USER 1001
 ENTRYPOINT ["jenkins-slave"]
 
