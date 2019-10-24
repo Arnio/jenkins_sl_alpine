@@ -29,3 +29,4 @@ RUN cd /tmp/ && tar -xzf /tmp/openshift-origin-client-tools-v3.11.0-bd0bee4-337-
 RUN ls -la /tmp/
 RUN ls -la /usr/local/bin/
 RUN chmod u+x /usr/local/bin/oc && chmod u+x /usr/local/bin/kubectl
+CMD ["/usr/local/bin/oc"]
