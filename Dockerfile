@@ -28,4 +28,4 @@ RUN cd /tmp/ && tar -xzf /tmp/openshift-origin-client-tools-v3.11.0-bd0bee4-337-
 # RUN curl https://artifacts-openshift-release-3-11.svc.ci.openshift.org/zips/openshift-origin-client-tools-v3.11.0-bd0bee4-337-linux-64bit.tar.gz | tar -zx 
 RUN ls -la /tmp/
 RUN ls -la /usr/local/bin/
-# RUN chmod u+x /usr/local/bin/oc && chmod u+x /usr/local/bin/kubectl
+RUN chmod u+x /usr/local/bin/oc && chmod u+x /usr/local/bin/kubectl
