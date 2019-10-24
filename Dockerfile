@@ -2,7 +2,7 @@ FROM jenkins/jnlp-slave:alpine
 
 ENV JENKINS_AGENT_WORKDIR /var/jenkins
 
-# USER root
+USER root
 
 RUN apk update && \
     apk upgrade && \
@@ -70,5 +70,5 @@ RUN ls -la /tmp/
 RUN ls -la /usr/local/bin/
 RUN chmod u+x /usr/local/bin/oc && chmod u+x /usr/local/bin/kubectl
 
-USER jenkins
 ENTRYPOINT ["jenkins-slave"]
+USER jenkins
