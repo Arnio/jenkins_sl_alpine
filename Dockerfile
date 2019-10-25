@@ -66,10 +66,10 @@ RUN cd /tmp/ && tar -xzf /tmp/openshift-origin-client-tools-v3.11.0-bd0bee4-337-
     rm -rf /tmp/openshift-origin-client*
 # RUN mv /tmp/openshift-origin-client-tools-v3.11.0-bd0bee4-337-linux-64bit/oc /tmp/openshift-origin-client-tools-v3.11.0-bd0bee4-337-linux-64bit/kubectl /usr/local/bin/
 # RUN curl https://artifacts-openshift-release-3-11.svc.ci.openshift.org/zips/openshift-origin-client-tools-v3.11.0-bd0bee4-337-linux-64bit.tar.gz | tar -zx 
-RUN ls -la /tmp/
-RUN ls -la /usr/local/bin/
-RUN chmod u+x /usr/local/bin/oc && chmod u+x /usr/local/bin/kubectl
+# RUN ls -la /tmp/
+# RUN ls -la /usr/local/bin/
+# RUN chmod u+x /usr/local/bin/oc && chmod u+x /usr/local/bin/kubectl
 
-USER 1001
+USER 1000
 ENTRYPOINT ["jenkins-slave"]
 
