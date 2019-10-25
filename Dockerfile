@@ -1,6 +1,6 @@
 FROM jenkins/jnlp-slave:alpine
 
-ENV JENKINS_AGENT_WORKDIR /var/jenkins
+# ENV JENKINS_AGENT_WORKDIR /var/jenkins
 
 USER root
 
