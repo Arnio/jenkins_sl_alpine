@@ -7,8 +7,8 @@ USER root
 RUN apk update && \
     apk upgrade && \
     apk add openssl curl ca-certificates 
-RUN apk add --no-cache docker \
-            bash \
+RUN apk add --no-cache bash \
+#            docker \
             git \
             unzip && \
     rm -rf /var/cache/apk/* 
