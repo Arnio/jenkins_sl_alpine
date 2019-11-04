@@ -16,11 +16,11 @@ Notice information about connection to master node. This information will be use
 
 Start bash script with parameters:
 ```sh
-$./create-ci-slave.sh -n <namespase> -a <jenkins slave name> -p <secret> -u <URL>
+$./create-ci-slave.sh -n <namespace> -a <jenkins slave name> -p <secret> -u <URL>
 ```
 
-| key | description |
-| ----| ------------|
+| option | description |
+| -------| ------------|
 |-a | Jenkins slave node name (from master)|
 |-d | Delete configs before creating
 |-h | Help
