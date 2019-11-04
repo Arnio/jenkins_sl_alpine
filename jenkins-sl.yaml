@@ -1,0 +1,212 @@
+apiVersion: v1
+kind: Template
+labels:
+  application: ${JENKINS_NAME}
+metadata:
+  annotations:
+    openshift.io/display-name: ${JENKINS_NAME} deployments
+    tags: ${JENKINS_NAME}
+  name: ${JENKINS_NAME}-alpine
+  namespace: openshift
+objects:
+
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewBuild
+    labels:
+      build: ${JENKINS_NAME}
+    name: ${JENKINS_NAME}
+  spec:
+    lookupPolicy:
+      local: false
+
+- apiVersion: build.openshift.io/v1
+  kind: BuildConfig
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewBuild
+    labels:
+      build: ${JENKINS_NAME}
+    name: ${JENKINS_NAME}
+  spec:
+    failedBuildsHistoryLimit: 5
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: ${JENKINS_NAME}:latest
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      git:
+        uri: https://github.com/Arnio/jenkins_sl_alpine
+      type: Git
+    strategy:
+      dockerStrategy:
+      type: Docker
+    successfulBuildsHistoryLimit: 5
+    triggers:
+    - github:
+        secret: secretgit
+      type: GitHub
+    - generic:
+        secret: secretgen
+      type: Generic
+    - type: ConfigChange
+    - imageChange:
+        lastTriggeredImageID: docker.io/jenkins/jnlp-slave:alpine
+      type: ImageChange
+
+- apiVersion: v1
+  kind: ServiceAccount
+  metadata:
+    name: '${JENKINS_SERVICE_NAME}'
+
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: ClusterRoleBinding
+  metadata:
+    name: jenkins-deployer 
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: jenkins-deployer
+  subjects:
+  - kind: ServiceAccount
+    name: ${JENKINS_SERVICE_NAME}
+    namespace: ${JENKINS_NAMESPACE}
+
+- apiVersion: v1
+  groupNames: null
+  kind: RoleBinding
+  metadata:
+    name: ${JENKINS_SERVICE_NAME}_edit
+  roleRef:
+    name: edit
+  subjects:
+    - kind: ServiceAccount
+      name: ${JENKINS_SERVICE_NAME}
+
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    annotations:
+      template.openshift.io/expose-jenkins_secret: '{.data[''jenkins-secret'']}'
+    labels:
+      app: ${JENKINS_NAME}
+      template: ${JENKINS_NAME}
+    name: ${JENKINS_NAME}-secret
+  stringData:
+    jenkins-secret: ${JENKINS_SECRET}
+  type: Opaque
+
+- apiVersion: apps.openshift.io/v1
+  kind: DeploymentConfig
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftWebConsole
+    labels:
+      app: ${JENKINS_NAME}
+    name: ${JENKINS_NAME}
+  spec:
+    replicas: 1
+    selector:
+      app: ${JENKINS_NAME}
+      deploymentconfig: ${JENKINS_NAME}
+    strategy:
+      activeDeadlineSeconds: 21600
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        annotations:
+          openshift.io/generated-by: OpenShiftWebConsole
+        creationTimestamp: null
+        labels:
+          app: ${JENKINS_NAME}
+          deploymentconfig: ${JENKINS_NAME}
+      spec:
+        containers:
+        - env:
+          - name: JENKINS_URL
+            value: ${JENKINS_URL}
+          - name: JENKINS_NAME
+            value: ${JENKINS_NAME}
+          - name: JENKINS_SECRET
+            valueFrom:
+              secretKeyRef:
+                key: jenkins-secret
+                name: ${JENKINS_NAME}-secret
+          image: docker-registry.default.svc:5000/${JENKINS_NAMESPACE}/${JENKINS_NAME}
+          imagePullPolicy: Always
+          name: ${JENKINS_NAME}
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /home/jenkins/.jenkins
+            name: ${JENKINS_NAME}-1
+          - mountPath: /home/jenkins/agent
+            name: ${JENKINS_NAME}-2
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          runAsUser: 1000
+        terminationGracePeriodSeconds: 30
+        serviceAccount: ${JENKINS_SERVICE_NAME}
+        serviceAccountName: ${JENKINS_SERVICE_NAME}
+        volumes:
+        - emptyDir: {}
+          name: ${JENKINS_NAME}-1
+        - emptyDir: {}
+          name: ${JENKINS_NAME}-2
+    test: false
+    triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - ${JENKINS_NAME}
+        from:
+          kind: ImageStreamTag
+          name: ${JENKINS_NAME}:latest
+        lastTriggeredImage: docker-registry.default.svc:5000/${JENKINS_NAMESPACE}/${JENKINS_NAME}
+      type: ImageChange
+    - type: ConfigChange
+
+
+parameters:
+- description: Jenkins  namespace in openshift
+  displayname: jenkins  namespace in openshift
+  name: JENKINS_NAMESPACE
+  required: true
+
+- description: Jenkins Service Account name to openshift
+  displayname: Jenkins Service Account name to openshift
+  name: JENKINS_SERVICE_NAME
+  required: true
+  value: jenkins
+
+- description: Jenkins slave node name to openshift
+  displayname: jenkins slave node name to openshift
+  name: JENKINS_NAME
+  required: true
+
+- description: Jenkins master secret
+  displayname: jenkins master secret
+  name: JENKINS_SECRET
+  required: true
+
+- description: Jenkins Master URL
+  displayname: jenkins Master URL  
+  name: JENKINS_URL
+  required: true
+

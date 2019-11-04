@@ -1,0 +1,65 @@
+apiVersion: v1
+kind: Template
+labels:
+  application: ${JENKINS_NAMESPACE}
+metadata:
+  annotations:
+    openshift.io/display-name: ${JENKINS_NAMESPACE} policy
+    tags: ${JENKINS_NAMESPACE}
+  name: ${JENKINS_NAMESPACE}-policy
+  namespace: openshift
+objects:
+  
+- apiVersion: security.openshift.io/v1
+  fsGroup:
+    type: MustRunAs
+  groups: []
+  kind: SecurityContextConstraints
+  metadata:
+    name: uid1000
+  defaultAddCapabilities: null
+  allowHostDirVolumePlugin: false
+  allowHostIPC: false
+  allowHostNetwork: false
+  allowHostPID: false
+  allowHostPorts: false
+  allowPrivilegeEscalation: true
+  allowPrivilegedContainer: false
+  allowedCapabilities: null
+  priority: null
+  readOnlyRootFilesystem: false
+  requiredDropCapabilities:
+  - KILL
+  - MKNOD
+  - SYS_CHROOT
+  - SETUID
+  - SETGID
+  runAsUser:
+    type: MustRunAs
+    uid: 1000
+  seLinuxContext:
+    type: MustRunAs
+  supplementalGroups:
+    type: RunAsAny
+  users:
+  - system:serviceaccount:${JENKINS_NAMESPACE}:${JENKINS_SERVICE_NAME}
+  volumes:
+  - configMap
+  - downwardAPI
+  - emptyDir
+  - persistentVolumeClaim
+  - projected
+  - secret
+
+
+parameters:
+- description: Jenkins  namespace in openshift
+  displayname: jenkins  namespace in openshift
+  name: JENKINS_NAMESPACE
+  required: true
+
+- description: Jenkins Service Account name to openshift
+  displayname: Jenkins Service Account name to openshift
+  name: JENKINS_SERVICE_NAME
+  required: true
+  value: jenkins
